@@ -3,6 +3,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <URTouch.h>
+#include "Color_16.h"
 
 //Defining the display pins
 #define TFT_CS 53
@@ -27,7 +28,7 @@ void setup()
 	//Initializing the screen
 	scrn.begin();
 	scrn.setRotation(2);
-	scrn.fillScreen(ILI9341_BLACK);
+	scrn.fillScreen(Color_16::RGB888_TO_RGB565(0xFF0000));
 
 	//Initilizing the touch interface
 	touchIF.InitTouch(PORTRAIT);
