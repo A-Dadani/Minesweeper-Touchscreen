@@ -12,9 +12,9 @@ Board::Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth,
 	nBombs(nBombs)
 {
 	randomSeed(analogRead(2));
-	for (unsigned short int i = 0; i < NUMBER_CELLS_V; i++)
+	for (unsigned short int i = 0; i < NUMBER_CELLS_H; i++)
 	{
-		for (unsigned short int j = 0; j < NUMBER_CELLS_H; j++)
+		for (unsigned short int j = 0; j < NUMBER_CELLS_V; j++)
 		{
 			cells[i][j].SetPos(Vec2<unsigned short int> {i, j});
 		}
@@ -27,6 +27,30 @@ Board::Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth,
 		else
 		{
 			cells[randomCellX][randomCellY].SetContent(Cell::Content::Bomb);
+		}
+	}
+	for (unsigned short int i = 0; i < NUMBER_CELLS_H; i++)
+	{
+		for (unsigned short int j = 0; j < NUMBER_CELLS_V; j++)
+		{
+			if (cells[i][j].GetContent() == Cell::Content::Bomb) continue;
+			
+			unsigned char nNeighboringBombs = 0;
+			for (short int c = -1; c <= 1; c++)
+			{
+				for (short int l = -1; l <= 1; l++)
+				{
+					if ((c + i) < 0 || (l + j) < 0 || (c + i) >= NUMBER_CELLS_H || (l + j) >= NUMBER_CELLS_V) continue;
+					else
+					{
+						if (cells[i + c][j + l].GetContent() == Cell::Content::Bomb)
+						{
+							++nNeighboringBombs;
+						}
+					}
+				}
+			}
+			cells[i][j].SetnNeighboringBombs(nNeighboringBombs);
 		}
 	}
 }

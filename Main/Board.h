@@ -27,9 +27,12 @@ private:
 		Vec2<unsigned short int> GetPos() const { return myPos; }
 		void SetContent(Content c) { cellContent = c; }
 		Content GetContent() const { return cellContent; }
+		void SetnNeighboringBombs(unsigned char number) { nNeighboringBombs = number; }
+		unsigned char GetnNeighboringBombs() const { return nNeighboringBombs; }
 	private:
 		Vec2<unsigned short int> myPos;
 		Content cellContent = Content::Empty;
+		unsigned char nNeighboringBombs;
 	};
 public:
 	Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth, unsigned short int ScreenHeight,
