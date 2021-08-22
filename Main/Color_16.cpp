@@ -58,7 +58,7 @@ void Color_16::SetColor(uint16_t cWORD)
 	this->cWORD = cWORD;
 }
 
-uint16_t Color_16::GetColor() const
+uint16_t Color_16::GetWORD() const
 {
 	return cWORD;
 }

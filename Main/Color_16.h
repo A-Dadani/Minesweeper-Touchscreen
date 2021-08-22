@@ -1,6 +1,5 @@
 #pragma once
 #include <stdint.h>
-#include <cassert>
 
 class Color_16
 {
@@ -14,7 +13,7 @@ public:
 	Color_16(uint32_t cDWORD);
 	Color_16(uint8_t R, uint8_t G, uint8_t B);
 	void SetColor(uint16_t cWORD);
-	uint16_t GetColor() const;
+	uint16_t GetWORD() const;
 private:
 	uint16_t cWORD;
 };
