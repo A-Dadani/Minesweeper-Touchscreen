@@ -97,7 +97,7 @@ void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThi
 
 void Board::Cell::DrawNumber(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
 {
-	scrn.drawChar(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, nNeighboringBombs + 48, )
+	//scrn.drawChar(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, nNeighboringBombs + 48, )
 }
 
 void Board::Cell::DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
