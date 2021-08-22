@@ -83,6 +83,11 @@ void Board::Cell::DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBo
 	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + CELL_DIMENTIONS - 1, CELL_DIMENTIONS, darkBorderColor.GetWORD());
 	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, lightBorderColor.GetWORD());
 	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + CELL_DIMENTIONS - 1, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, darkBorderColor.GetWORD());
+	
+	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + 1, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + 1, CELL_DIMENTIONS - 2, lightBorderColor.GetWORD());
+	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + 1, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + CELL_DIMENTIONS - 2, CELL_DIMENTIONS - 2, darkBorderColor.GetWORD());
+	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + 1, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + 1, CELL_DIMENTIONS - 2, lightBorderColor.GetWORD());
+	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + CELL_DIMENTIONS - 2, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + 1, CELL_DIMENTIONS - 2, darkBorderColor.GetWORD());
 }
 
 void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
