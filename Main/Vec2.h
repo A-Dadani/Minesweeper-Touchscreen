@@ -39,6 +39,10 @@ public:
 	{
 		return Vec2{ (T2)x, (T2)y };
 	}
+	bool operator==(const Vec2& rhs)
+	{
+		return x == rhs.x && y == rhs.y;
+	}
 private:
 	T x;
 	T y;

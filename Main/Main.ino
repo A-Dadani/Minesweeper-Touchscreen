@@ -4,6 +4,7 @@
 #include <Adafruit_ILI9341.h>
 #include <URTouch.h>
 #include <stdint.h>
+#include "Vec2.h"
 #include "Color_16.h"
 #include "Board.h"
 
@@ -29,8 +30,7 @@
 #define BORDER_COLOR 0x001F //BLUE
 #define NUMBER_BOMBS 15
 
-//!!!!DO NOT USE PIN 2 IT IS USED AS THE INPUT FOR A RANDOM SEED!!!!
-//!!!!!!!!!!!!!!!!!!!!(REFER TO BOARD.CPP)!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!DO NOT USE PIN 2 FOR ANYTHING, IT IS USED AS THE SEED INPUT FOR THE RANDOM GENERATION OF BOMB POSITIONS!!
 
 Adafruit_ILI9341 scrn = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 URTouch touchIF(t_SCK, t_CS, t_MOSI, t_MISO, t_IRQ);
@@ -47,7 +47,28 @@ void setup()
 	touchIF.setPrecision(PREC_EXTREME);
 
 	//Setting up the game board
-	brd.Setup();
+	Vec2<unsigned short int> bombCoords[NUMBER_BOMBS];
+	randomSeed(analogRead(2));
+	for (unsigned char i = 0; i < NUMBER_BOMBS; i++)
+	{
+		bool isDuplicate = false;
+		Vec2<unsigned short int> thisBombPos{ (unsigned short int)random(0, NUMBER_CELLS_H), (unsigned short int)random(0, NUMBER_CELLS_V) };
+		for (int j = 0; j < i; j++)
+		{
+			if (thisBombPos == bombCoords[j])
+			{
+				isDuplicate = true;
+				--i;
+				break;
+			}
+		}
+		if (isDuplicate) continue;
+		else
+		{
+			bombCoords[i] = thisBombPos;
+		}
+	}
+	brd.Setup(bombCoords); 
 }
 
 void loop()

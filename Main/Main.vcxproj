@@ -112,6 +112,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Algorithm.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Color_16.h" />
     <ClInclude Include="Vec2.h" />

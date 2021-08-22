@@ -6,7 +6,7 @@
 #include "Color_16.h"
 #include "Vec2.h"
 
-#define NUMBER_CELLS_H 11
+#define NUMBER_CELLS_H 11 //Number of HORIZONTAL cells, not referencing a header
 #define NUMBER_CELLS_V 15
 #define CELL_DIMENTIONS 20
 
@@ -27,7 +27,7 @@ private:
 			Uncovered
 		};
 	public:
-		//Could've used Vec2<char> instead, but it's too late
+		//Could've used Vec2<char> instead, but eh ¯\_(._.)_/¯ who cares
 		void SetPos(const Vec2<unsigned short int> Pos) { myPos = Pos; }
 		Vec2<unsigned short int> GetPos() const { return myPos; }
 		void SetContent(Content c) { cellContent = c; }
@@ -51,7 +51,7 @@ public:
 		unsigned short int BorderThiccness, unsigned short int nBombs,
 		Color_16 BorderColor = Color_16{ (uint16_t)ILI9341_BLUE });
 	void DrawBorders();
-	void Setup();
+	void Setup(Vec2<unsigned short int>* bombCoords);
 private:
 	Adafruit_ILI9341& scrn;
 	Color_16 borderColor;
@@ -59,6 +59,6 @@ private:
 
 	const unsigned short int ScreenWidth;
 	const unsigned short int ScreenHeight;
-	const unsigned short int BorderThiccness;
+	const unsigned short int BorderThiccness; //Thicc border o_o
 	const unsigned short int nBombs;
 };
