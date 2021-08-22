@@ -10,6 +10,9 @@
 #define NUMBER_CELLS_V 15
 #define CELL_DIMENTIONS 20
 
+#define BOMB_COUNT_CENTERING_OFFSET_X 5
+#define BOMB_COUNT_CENTERING_OFFSET_Y 3
+
 class Board
 {
 private:

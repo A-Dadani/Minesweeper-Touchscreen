@@ -97,7 +97,7 @@ void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThi
 
 void Board::Cell::DrawNumber(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
 {
-	//scrn.drawChar(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, nNeighboringBombs + 48, )
+	scrn.drawChar(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_X, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_Y, nNeighboringBombs + 48, numberColors[nNeighboringBombs - 1].GetWORD(), cellFillingColor.GetWORD(), 2);
 }
 
 void Board::Cell::DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
