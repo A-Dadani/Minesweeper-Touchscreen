@@ -102,4 +102,10 @@ void Board::Cell::DrawNumber(Adafruit_ILI9341& scrn, unsigned short int boardBor
 
 void Board::Cell::DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
 {
+	scrn.fillCircle(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, BOMB_RADIUS, 0x0000);
+	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET - BOMB_RADIUS - BOMB_NIPPLE_LENGTH, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, BOMB_NIPPLE_LENGTH, 0x0000);
+	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET + BOMB_RADIUS + BOMB_NIPPLE_LENGTH, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, BOMB_NIPPLE_LENGTH, 0x0000);
+	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET - BOMB_RADIUS - BOMB_NIPPLE_LENGTH, BOMB_NIPPLE_LENGTH, 0x0000);
+	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET + BOMB_RADIUS + BOMB_NIPPLE_LENGTH, BOMB_NIPPLE_LENGTH, 0x0000);
+	scrn.drawRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET - 2, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET - 2, 2, 2, 0xFFFF);
 }

@@ -12,6 +12,10 @@
 
 #define BOMB_COUNT_CENTERING_OFFSET_X 5
 #define BOMB_COUNT_CENTERING_OFFSET_Y 3
+#define BOMB_SELF_CENTERING_OFFSET 10
+//For bomb drawing
+#define BOMB_RADIUS	5
+#define BOMB_NIPPLE_LENGTH 1
 
 class Board
 {
