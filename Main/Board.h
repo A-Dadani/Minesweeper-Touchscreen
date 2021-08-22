@@ -37,14 +37,26 @@ private:
 		void DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
 		void Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
 	private:
+		void DrawNumber(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
+		void DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
+	private:
 		Vec2<unsigned short int> myPos;
 		Content cellContent = Content::Empty;
 		Status cellStatus = Status::Covered;
 		unsigned char nNeighboringBombs;
-
+	private: //COLOR TIME!
 		Color_16 lightBorderColor{ (uint16_t)0xFFFF };
 		Color_16 darkBorderColor{ (uint32_t)0x808080 };
 		Color_16 cellFillingColor{ (uint32_t)0xC6C6C6 };
+
+		//Colors for the number of neighboring bombs
+		Color_16 oneColor{ (uint32_t)0x0200FD };
+		Color_16 twoColor{ (uint32_t)0x017E02 };
+		Color_16 threeColor{ (uint32_t)0xFE0000 };
+		Color_16 fourColor{ (uint32_t)0x010180 };
+		Color_16 fiveColor{ (uint32_t)0x7F0300 };
+		Color_16 sixColor{ (uint32_t)0x008080 };
+		Color_16 sevenColor{ (uint16_t)0x0000 };
 	};
 public:
 	Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth, unsigned short int ScreenHeight,
