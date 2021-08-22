@@ -3,6 +3,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <URTouch.h>
+#include <stdint.h>
 #include "Color_16.h"
 #include "Board.h"
 
@@ -33,21 +34,20 @@
 
 Adafruit_ILI9341 scrn = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 URTouch touchIF(t_SCK, t_CS, t_MOSI, t_MISO, t_IRQ);
-Board brd(scrn, SCREEN_WIDTH, SCREEN_HEIGHT, NUMBER_BOMBS, BORDER_COLOR);
+Board brd(scrn, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_THICCNESS, NUMBER_BOMBS, Color_16{ (uint16_t)BORDER_COLOR });
 
 void setup()
 {
 	//Initializing the screen
 	scrn.begin();
 	scrn.setRotation(2);
-	scrn.fillScreen(ILI9341_BLACK);
 
 	//Initilizing the touch interface
 	touchIF.InitTouch(PORTRAIT);
 	touchIF.setPrecision(PREC_EXTREME);
 
 	//Setting up the game board
-	
+	brd.Setup();
 }
 
 void loop()

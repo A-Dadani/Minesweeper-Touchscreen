@@ -11,6 +11,8 @@ Board::Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth,
 	BorderThiccness(BorderThiccness),
 	nBombs(nBombs)
 {
+	//There's probably a much better way but since this is going to run before the
+	//program starts it won't impact the actual speed of the gameplay so it doesn't matter
 	randomSeed(analogRead(2));
 	for (unsigned short int i = 0; i < NUMBER_CELLS_H; i++)
 	{
@@ -65,4 +67,26 @@ void Board::DrawBorders()
 
 void Board::Setup()
 {
+	DrawBorders();
+	for (unsigned short int i = 0; i < NUMBER_CELLS_H; i++)
+	{
+		for (unsigned short int j = 0; j < NUMBER_CELLS_V; j++)
+		{
+			cells[i][j].Draw(scrn, BorderThiccness);
+		}
+	}
+}
+
+void Board::Cell::DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
+{
+	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, lightBorderColor.GetWORD());
+	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + CELL_DIMENTIONS - 1, CELL_DIMENTIONS, darkBorderColor.GetWORD());
+	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, lightBorderColor.GetWORD());
+	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + CELL_DIMENTIONS - 1, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, darkBorderColor.GetWORD());
+}
+
+void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
+{
+	scrn.fillRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, CELL_DIMENTIONS, cellFillingColor.GetWORD());
+	DrawBorders(scrn, boardBorderThiccness);
 }

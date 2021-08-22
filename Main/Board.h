@@ -2,6 +2,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <Array.h>
+#include <stdint.h>
 #include "Color_16.h"
 #include "Vec2.h"
 
@@ -20,8 +21,12 @@ private:
 			Empty,
 			Bomb
 		};
+		enum class Status
+		{
+			Covered,
+			Uncovered
+		};
 	public:
-		Cell() = default;
 		//Could've used Vec2<char> instead, but it's too late
 		void SetPos(const Vec2<unsigned short int> Pos) { myPos = Pos; }
 		Vec2<unsigned short int> GetPos() const { return myPos; }
@@ -29,10 +34,17 @@ private:
 		Content GetContent() const { return cellContent; }
 		void SetnNeighboringBombs(unsigned char number) { nNeighboringBombs = number; }
 		unsigned char GetnNeighboringBombs() const { return nNeighboringBombs; }
+		void DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
+		void Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
 	private:
 		Vec2<unsigned short int> myPos;
 		Content cellContent = Content::Empty;
+		Status cellStatus = Status::Covered;
 		unsigned char nNeighboringBombs;
+
+		Color_16 lightBorderColor{ (uint16_t)0xFFFF };
+		Color_16 darkBorderColor{ (uint32_t)0x808080 };
+		Color_16 cellFillingColor{ (uint32_t)0xC6C6C6 };
 	};
 public:
 	Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth, unsigned short int ScreenHeight,
