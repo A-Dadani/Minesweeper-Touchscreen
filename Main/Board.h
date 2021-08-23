@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "Color_16.h"
 #include "Vec2.h"
+#include "GameStatus.h"
 
 #define NUMBER_CELLS_H 11 //Number of HORIZONTAL cells, not referencing a header
 #define NUMBER_CELLS_V 15
@@ -75,13 +76,16 @@ private:
 	};
 public:
 	Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth, unsigned short int ScreenHeight,
-		unsigned short int BorderThiccness, unsigned short int nBombs,
+		unsigned short int BorderThiccness, unsigned short int nBombs, GameStatus& gameStatus,
 		Color_16 BorderColor = Color_16{ (uint16_t)ILI9341_BLUE });
 	void DrawBorders();
 	void Setup(Vec2<unsigned short int>* bombCoords);
 	void TouchInput(const Vec2<uint16_t>& touchCoords);
 	void RevealCell(const Vec2<uint16_t>& cellCoords);
 private:
+	void RevealAllBombs();
+private:
+	GameStatus& gameStatus;
 	Adafruit_ILI9341& scrn;
 	Color_16 borderColor;
 	Cell cells[NUMBER_CELLS_H][NUMBER_CELLS_V];

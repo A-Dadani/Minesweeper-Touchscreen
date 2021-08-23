@@ -7,6 +7,7 @@
 #include "Vec2.h"
 #include "Color_16.h"
 #include "Board.h"
+#include "GameStatus.h"
 
 //Defining the display pins
 #define TFT_CS 53
@@ -30,18 +31,21 @@
 #define BORDER_COLOR 0x001F //BLUE
 #define NUMBER_BOMBS 15
 
-//!!DO NOT USE PIN 2 FOR ANYTHING, IT IS USED AS THE SEED INPUT FOR THE RANDOM GENERATION OF BOMB POSITIONS!!
-
-Adafruit_ILI9341 scrn = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
-URTouch touchIF(t_SCK, t_CS, t_MOSI, t_MISO, t_IRQ);
-Board brd(scrn, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_THICCNESS, NUMBER_BOMBS, Color_16{ (uint16_t)BORDER_COLOR });
-
 uint16_t getCorrectedY(uint16_t Y)
 {
 	return (SCREEN_HEIGHT - Y) - 5;
 }
 
 Vec2<uint16_t> touchCoordinates;
+GameStatus gameStatus = GameStatus::Playing;
+bool isLostScreenDisplayed = false;
+
+//!!DO NOT USE PIN 2 FOR ANYTHING, IT IS USED AS THE SEED INPUT FOR THE RANDOM GENERATION OF BOMB POSITIONS!!
+
+Adafruit_ILI9341 scrn = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+URTouch touchIF(t_SCK, t_CS, t_MOSI, t_MISO, t_IRQ);
+Board brd(scrn, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_THICCNESS, NUMBER_BOMBS, gameStatus, Color_16{ (uint16_t)BORDER_COLOR });
+
 
 void setup()
 {
@@ -80,10 +84,25 @@ void setup()
 
 void loop()
 {
-	while (touchIF.dataAvailable())
+	if (gameStatus == GameStatus::Playing)
 	{
-		touchIF.read();
-		touchCoordinates = Vec2<uint16_t>{ touchIF.getX(), getCorrectedY(touchIF.getY()) };
-		brd.TouchInput(touchCoordinates);
+		while (touchIF.dataAvailable())
+		{
+			touchIF.read();
+			touchCoordinates = Vec2<uint16_t>{ touchIF.getX(), getCorrectedY(touchIF.getY()) };
+			brd.TouchInput(touchCoordinates);
+			if (gameStatus == GameStatus::Lost) break;
+		}
+	}
+	else if (gameStatus == GameStatus::Lost && !isLostScreenDisplayed)
+	{
+		isLostScreenDisplayed = true;
+		scrn.fillRect(BORDER_THICCNESS, BORDER_THICCNESS, SCREEN_WIDTH - BORDER_THICCNESS * 2, SCREEN_HEIGHT - BORDER_THICCNESS * 2, Color_16::RGB888_TO_RGB565(0xFF0000));
+		scrn.setTextSize(4);
+		scrn.setTextColor(0xFFFF);
+		scrn.setCursor(SCREEN_WIDTH / 2 - 2 * 5 * 4 - 5, SCREEN_HEIGHT / 2 - 4 * 7 - 10);
+		scrn.print("GAME");
+		scrn.setCursor(SCREEN_WIDTH / 2 - 2 * 5 * 4 - 5, SCREEN_HEIGHT / 2 + 10);
+		scrn.print("OVER");
 	}
 }

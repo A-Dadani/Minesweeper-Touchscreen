@@ -22,7 +22,7 @@
     <ClInclude Include="Color_16.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Algorithm.h">
+    <ClInclude Include="GameStatus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
