@@ -20,6 +20,11 @@
 
 class Board
 {
+public:
+	static Vec2<uint16_t> RemapTouchToGridCoords(const Vec2<uint16_t> touchCoords, unsigned char boardBorderThiccness) //Touch coords MUST be inbound or unexpected values in return
+	{
+		return Vec2<uint16_t> {(uint16_t)((touchCoords.GetX() - boardBorderThiccness) / CELL_DIMENTIONS), (uint16_t)((touchCoords.GetY() - boardBorderThiccness) / CELL_DIMENTIONS)};
+	}
 private:
 	class Cell
 	{
@@ -29,17 +34,23 @@ private:
 			Empty,
 			Bomb
 		};
+		enum class Status
+		{
+			Revealed,
+			Hidden
+		};
 	public:
 		//Could've used Vec2<char> instead, but eh ¯\_(._.)_/¯ who cares
 		void SetPos(const Vec2<unsigned short int> Pos) { myPos = Pos; }
 		Vec2<unsigned short int> GetPos() const { return myPos; }
 		void SetContent(Content c) { cellContent = c; }
 		Content GetContent() const { return cellContent; }
+		Status GetStatus() const { return cellStatus; }
 		void SetnNeighboringBombs(unsigned char number) { nNeighboringBombs = number; }
 		unsigned char GetnNeighboringBombs() const { return nNeighboringBombs; }
 		void DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
 		void Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
-		void RevealCell(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
+		void Reveal(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness);
 	private:
 		void DrawNumber(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
 		void DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
@@ -49,6 +60,7 @@ private:
 	private:
 		Vec2<unsigned short int> myPos;
 		Content cellContent = Content::Empty;
+		Status cellStatus = Status::Hidden;
 		unsigned char nNeighboringBombs;
 	private: //COLOR TIME!
 		Color_16 lightBorderColor{ (uint16_t)0xFFFF };
@@ -67,6 +79,8 @@ public:
 		Color_16 BorderColor = Color_16{ (uint16_t)ILI9341_BLUE });
 	void DrawBorders();
 	void Setup(Vec2<unsigned short int>* bombCoords);
+	void TouchInput(const Vec2<uint16_t>& touchCoords);
+	void RevealCell(const Vec2<uint16_t>& cellCoords);
 private:
 	Adafruit_ILI9341& scrn;
 	Color_16 borderColor;

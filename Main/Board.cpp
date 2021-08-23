@@ -76,6 +76,36 @@ void Board::Setup(Vec2<unsigned short int>* bombCoords)
 	}
 }
 
+void Board::TouchInput(const Vec2<uint16_t>& touchCoords)
+{
+	//if (touchCoords.GetX() >= BorderThiccness && touchCoords.GetY() >= BorderThiccness
+	//	&& touchCoords.GetX() <= (ScreenWidth - BorderThiccness) && touchCoords.GetY() <= (ScreenHeight - BorderThiccness))
+	//{
+		Vec2<uint16_t> GridCoords = RemapTouchToGridCoords(touchCoords, BorderThiccness);
+		RevealCell(GridCoords);
+	//}
+}
+
+void Board::RevealCell(const Vec2<uint16_t>& cellCoords)
+{
+	cells[cellCoords.GetX()][cellCoords.GetY()].Reveal(scrn, BorderThiccness);
+	if (cells[cellCoords.GetX()][cellCoords.GetY()].GetnNeighboringBombs() == 0)
+	{
+		for (short int c = -1; c <= 1; c++)
+		{
+			for (short int l = -1; l <= 1; l++)
+			{
+				if ((c + cellCoords.GetX()) < 0 || (l + cellCoords.GetY()) < 0 || (c + cellCoords.GetX()) >= NUMBER_CELLS_H || (l + cellCoords.GetY()) >= NUMBER_CELLS_V) continue;
+				else if (cells[cellCoords.GetX() + c][cellCoords.GetY() + l].GetStatus() == Cell::Status::Revealed) continue;
+				else
+				{
+					RevealCell(Vec2<uint16_t>{cellCoords.GetX() + c, cellCoords.GetY() + l});
+				}
+			}
+		}
+	}
+}
+
 void Board::Cell::DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
 {
 	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, lightBorderColor.GetWORD());
@@ -95,8 +125,9 @@ void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThi
 	DrawBorders(scrn, boardBorderThiccness);
 }
 
-void Board::Cell::RevealCell(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
+void Board::Cell::Reveal(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness)
 {
+	cellStatus = Status::Revealed;
 	if (cellContent == Content::Bomb)
 	{
 		DrawRevealedCellBackground(scrn, boardBorderThiccness, bombCellBackground);

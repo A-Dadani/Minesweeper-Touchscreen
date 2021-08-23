@@ -36,6 +36,13 @@ Adafruit_ILI9341 scrn = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_
 URTouch touchIF(t_SCK, t_CS, t_MOSI, t_MISO, t_IRQ);
 Board brd(scrn, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_THICCNESS, NUMBER_BOMBS, Color_16{ (uint16_t)BORDER_COLOR });
 
+uint16_t getCorrectedY(uint16_t Y)
+{
+	return (SCREEN_HEIGHT - Y) - 5;
+}
+
+Vec2<uint16_t> touchCoordinates;
+
 void setup()
 {
 	//Initializing the screen
@@ -76,7 +83,7 @@ void loop()
 	while (touchIF.dataAvailable())
 	{
 		touchIF.read();
-
+		touchCoordinates = Vec2<uint16_t>{ touchIF.getX(), getCorrectedY(touchIF.getY()) };
+		brd.TouchInput(touchCoordinates);
 	}
-
 }
