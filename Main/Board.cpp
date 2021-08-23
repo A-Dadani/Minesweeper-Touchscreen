@@ -52,7 +52,7 @@ void Board::Setup(Vec2<unsigned short int>* bombCoords)
 			{
 				for (short int l = -1; l <= 1; l++)
 				{
-					if ((c + i) < 0 || (l + j) < 0 || (c + i) >= NUMBER_CELLS_H || (l + j) >= NUMBER_CELLS_V) continue;
+					if ((c + i) < 0 || (l + j) < 0 || (c + i) >= NUMBER_CELLS_H || (l + j) >= NUMBER_CELLS_V) continue; // Could be better optimized by moving the c conditions to the parent loop
 					else
 					{
 						if (cells[i + c][j + l].GetContent() == Cell::Content::Bomb)
@@ -95,9 +95,27 @@ void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThi
 	DrawBorders(scrn, boardBorderThiccness);
 }
 
+void Board::Cell::RevealCell(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
+{
+	if (cellContent == Content::Bomb)
+	{
+		DrawRevealedCellBackground(scrn, boardBorderThiccness, bombCellBackground);
+		DrawBomb(scrn, boardBorderThiccness);
+	}
+	else
+	{
+		DrawRevealedCellBackground(scrn, boardBorderThiccness);
+		if (nNeighboringBombs != 0)
+		{
+			DrawNumber(scrn, boardBorderThiccness);
+		}
+	}
+	DrawRevealedCellBorder(scrn, boardBorderThiccness);
+}
+
 void Board::Cell::DrawNumber(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
 {
-	scrn.drawChar(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_X, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_Y, nNeighboringBombs + 48, numberColors[nNeighboringBombs - 1].GetWORD(), cellFillingColor.GetWORD(), 2);
+	scrn.drawChar(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_X, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_Y, nNeighboringBombs + 48, numberColors[nNeighboringBombs - 1].GetWORD(), revealedCellFillingColor.GetWORD(), NUMBER_NEIGHBORING_BOMBS_SIZE);
 }
 
 void Board::Cell::DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
@@ -108,4 +126,20 @@ void Board::Cell::DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorde
 	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET - BOMB_RADIUS - BOMB_NIPPLE_LENGTH, BOMB_NIPPLE_LENGTH, 0x0000);
 	scrn.drawFastVLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET + BOMB_RADIUS + BOMB_NIPPLE_LENGTH, BOMB_NIPPLE_LENGTH, 0x0000);
 	scrn.drawRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET - 2, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_SELF_CENTERING_OFFSET - 2, 2, 2, 0xFFFF);
+}
+
+void Board::Cell::DrawRevealedCellBackground(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness, Color_16 c) const
+{
+	scrn.fillRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, CELL_DIMENTIONS, c.GetWORD());
+	scrn.drawRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, CELL_DIMENTIONS, revealedCellBorderColor.GetWORD());
+}
+
+void Board::Cell::DrawRevealedCellBackground(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
+{
+	DrawRevealedCellBackground(scrn, boardBorderThiccness, revealedCellFillingColor);
+}
+
+void Board::Cell::DrawRevealedCellBorder(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
+{
+	scrn.drawRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, CELL_DIMENTIONS, revealedCellBorderColor.GetWORD());
 }

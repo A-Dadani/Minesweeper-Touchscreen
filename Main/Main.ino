@@ -73,4 +73,10 @@ void setup()
 
 void loop()
 {
+	while (touchIF.dataAvailable())
+	{
+		touchIF.read();
+
+	}
+
 }
