@@ -67,6 +67,7 @@ void Board::Setup(Vec2<unsigned short int>* bombCoords)
 		}
 	}
 
+	//Drawing the sprites on the screen (The borders and the cells)
 	DrawBorders();
 	for (unsigned short int i = 0; i < NUMBER_CELLS_H; i++)
 	{
@@ -88,6 +89,19 @@ void Board::TouchInput(const Vec2<uint16_t>& touchCoords)
 	}
 }
 
+void Board::FlagInput(const Vec2<uint16_t>& touchCoords)
+{
+	Vec2<uint16_t> GridCoords = RemapTouchToGridCoords(touchCoords, BorderThiccness);
+	if (cells[GridCoords.GetX()][GridCoords.GetY()].GetStatus() == Cell::Status::Flagged)
+	{
+		cells[GridCoords.GetX()][GridCoords.GetY()].EraseFlag(scrn, BorderThiccness);
+	}
+	else if (cells[GridCoords.GetX()][GridCoords.GetY()].GetStatus() == Cell::Status::Hidden)
+	{
+		cells[GridCoords.GetX()][GridCoords.GetY()].DrawFlag(scrn, BorderThiccness);
+	}
+}
+
 void Board::Cell::DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
 {
 	scrn.drawFastHLine(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, lightBorderColor.GetWORD());
@@ -103,13 +117,22 @@ void Board::Cell::DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBo
 
 void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const
 {
-	scrn.fillRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, CELL_DIMENTIONS, cellFillingColor.GetWORD());
+	Draw(scrn, boardBorderThiccness, cellFillingColor);
+}
+
+void Board::Cell::Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness, Color_16 c) const
+{
+	scrn.fillRect(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness, CELL_DIMENTIONS, CELL_DIMENTIONS, c.GetWORD());
 	DrawBorders(scrn, boardBorderThiccness);
 }
 
 void Board::RevealCell(const Vec2<uint16_t>& cellCoords)
 {
-	cells[cellCoords.GetX()][cellCoords.GetY()].Reveal(scrn, BorderThiccness);
+	if (cells[cellCoords.GetX()][cellCoords.GetY()].GetStatus() != Cell::Status::Hidden)
+	{
+		return; //Do nothing if the cell is flagged to avoid any accidental presses
+	}
+	cells[cellCoords.GetX()][cellCoords.GetY()].Reveal(scrn, BorderThiccness, nHiddenCells);
 	if (cells[cellCoords.GetX()][cellCoords.GetY()].GetContent() == Cell::Content::Bomb)
 	{
 		gameStatus = GameStatus::Lost;
@@ -132,10 +155,16 @@ void Board::RevealCell(const Vec2<uint16_t>& cellCoords)
 			}
 		}
 	}
+	if (nHiddenCells == nBombs)
+	{
+		gameStatus = GameStatus::Won;
+		return; //optional but let's just keep everything consistant
+	}
 }
 
-void Board::Cell::Reveal(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness)
+void Board::Cell::Reveal(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness, uint16_t& nHiddenCells)
 {
+	--nHiddenCells;
 	cellStatus = Status::Revealed;
 	if (cellContent == Content::Bomb)
 	{
@@ -153,13 +182,26 @@ void Board::Cell::Reveal(Adafruit_ILI9341& scrn, unsigned short int boardBorderT
 	DrawRevealedCellBorder(scrn, boardBorderThiccness);
 }
 
+void Board::Cell::DrawFlag(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness)
+{
+	cellStatus = Status::Flagged;
+	//scrn.drawChar(myPos.GetX() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_X, myPos.GetY() * CELL_DIMENTIONS + boardBorderThiccness + BOMB_COUNT_CENTERING_OFFSET_Y, 'X', Color_16::RGB888_TO_RGB565(0xFF0000), cellFillingColor.GetWORD(), NUMBER_NEIGHBORING_BOMBS_SIZE);
+	Draw(scrn, boardBorderThiccness, flaggedCellFillingColor);
+}
+
+void Board::Cell::EraseFlag(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness)
+{
+	cellStatus = Status::Hidden;
+	Draw(scrn, boardBorderThiccness);
+}
+
 void Board::RevealAllBombs()
 {
 	for (auto& cL : cells)
 	{
 		for (auto& c : cL)
 		{
-			if (c.GetContent() == Cell::Content::Bomb) c.Reveal(scrn, BorderThiccness);
+			if (c.GetContent() == Cell::Content::Bomb) c.Reveal(scrn, BorderThiccness, nHiddenCells);
 		}
 	}
 }

@@ -24,6 +24,8 @@
 #define t_MISO 29
 #define t_IRQ 30
 
+#define FLAG_BTN_PIN 33
+
 //Change this according to the screen
 #define SCREEN_WIDTH  240
 #define SCREEN_HEIGHT 320
@@ -38,7 +40,8 @@ uint16_t getCorrectedY(uint16_t Y)
 
 Vec2<uint16_t> touchCoordinates;
 GameStatus gameStatus = GameStatus::Playing;
-bool isLostScreenDisplayed = false;
+bool isEndScreenDisplayed = false;
+bool trueInputFlag = false;
 
 //!!DO NOT USE PIN 2 FOR ANYTHING, IT IS USED AS THE SEED INPUT FOR THE RANDOM GENERATION OF BOMB POSITIONS!!
 
@@ -46,9 +49,10 @@ Adafruit_ILI9341 scrn = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_
 URTouch touchIF(t_SCK, t_CS, t_MOSI, t_MISO, t_IRQ);
 Board brd(scrn, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_THICCNESS, NUMBER_BOMBS, gameStatus, Color_16{ (uint16_t)BORDER_COLOR });
 
-
 void setup()
 {
+	pinMode(FLAG_BTN_PIN, INPUT);
+
 	//Initializing the screen
 	scrn.begin();
 	scrn.setRotation(2);
@@ -90,13 +94,24 @@ void loop()
 		{
 			touchIF.read();
 			touchCoordinates = Vec2<uint16_t>{ touchIF.getX(), getCorrectedY(touchIF.getY()) };
-			brd.TouchInput(touchCoordinates);
-			if (gameStatus == GameStatus::Lost) break;
+			bool tempFlagBTNState = digitalRead(FLAG_BTN_PIN); // This is done so that we don't capture FLAG_BTN_PIN twice leading to some unexpected bugs
+			if (tempFlagBTNState && !trueInputFlag)
+			{
+				trueInputFlag = true;
+				brd.FlagInput(touchCoordinates);
+			}
+			else if (!tempFlagBTNState)
+			{
+				trueInputFlag = false;
+				brd.TouchInput(touchCoordinates);
+			}
+			if (gameStatus == GameStatus::Lost || gameStatus == GameStatus::Won) break;
 		}
+		trueInputFlag = false;
 	}
-	else if (gameStatus == GameStatus::Lost && !isLostScreenDisplayed)
+	else if (gameStatus == GameStatus::Lost && !isEndScreenDisplayed)
 	{
-		isLostScreenDisplayed = true;
+		isEndScreenDisplayed = true;
 		scrn.fillRect(BORDER_THICCNESS, BORDER_THICCNESS, SCREEN_WIDTH - BORDER_THICCNESS * 2, SCREEN_HEIGHT - BORDER_THICCNESS * 2, Color_16::RGB888_TO_RGB565(0xFF0000));
 		scrn.setTextSize(4);
 		scrn.setTextColor(0xFFFF);
@@ -104,5 +119,16 @@ void loop()
 		scrn.print("GAME");
 		scrn.setCursor(SCREEN_WIDTH / 2 - 2 * 5 * 4 - 5, SCREEN_HEIGHT / 2 + 10);
 		scrn.print("OVER");
+	}
+	else if (gameStatus == GameStatus::Won && !isEndScreenDisplayed)
+	{ 
+		isEndScreenDisplayed = true;
+		scrn.fillRect(BORDER_THICCNESS, BORDER_THICCNESS, SCREEN_WIDTH - BORDER_THICCNESS * 2, SCREEN_HEIGHT - BORDER_THICCNESS * 2, Color_16::RGB888_TO_RGB565(0x00FF00));
+		scrn.setTextSize(4);
+		scrn.setTextColor(0xFFFF);
+		scrn.setCursor(SCREEN_WIDTH / 2 - 2 * 3 * 4 - 5, SCREEN_HEIGHT / 2 - 4 * 7 - 10);
+		scrn.print("YOU");
+		scrn.setCursor(SCREEN_WIDTH / 2 - 2 * 3 * 4 - 5, SCREEN_HEIGHT / 2 + 10);
+		scrn.print("WON");
 	}
 }

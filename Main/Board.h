@@ -38,7 +38,8 @@ private:
 		enum class Status
 		{
 			Revealed,
-			Hidden
+			Hidden,
+			Flagged
 		};
 	public:
 		//Could've used Vec2<char> instead, but eh ¯\_(._.)_/¯ who cares
@@ -51,7 +52,10 @@ private:
 		unsigned char GetnNeighboringBombs() const { return nNeighboringBombs; }
 		void DrawBorders(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
 		void Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
-		void Reveal(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness);
+		void Draw(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness, Color_16 c) const;
+		void Reveal(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness, uint16_t& nHiddenCells);
+		void DrawFlag(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness);
+		void EraseFlag(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness);
 	private:
 		void DrawNumber(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
 		void DrawBomb(Adafruit_ILI9341& scrn, unsigned short int boardBorderThiccness) const;
@@ -68,6 +72,7 @@ private:
 		Color_16 darkBorderColor{ (uint32_t)0x808080 };
 		Color_16 cellFillingColor{ (uint32_t)0xC6C6C6 };
 		Color_16 revealedCellFillingColor{ (uint32_t)0x9E9E9E };
+		Color_16 flaggedCellFillingColor{ (uint32_t)0xFF0000 };
 		Color_16 revealedCellBorderColor{ (uint32_t)0x414141 };
 		Color_16 bombCellBackground{ (uint32_t)0xFF0000 };
 		//Colors for the number of neighboring bombs
@@ -78,11 +83,12 @@ public:
 	Board(Adafruit_ILI9341& scrn, unsigned short int ScreenWidth, unsigned short int ScreenHeight,
 		unsigned short int BorderThiccness, unsigned short int nBombs, GameStatus& gameStatus,
 		Color_16 BorderColor = Color_16{ (uint16_t)ILI9341_BLUE });
-	void DrawBorders();
 	void Setup(Vec2<unsigned short int>* bombCoords);
 	void TouchInput(const Vec2<uint16_t>& touchCoords);
-	void RevealCell(const Vec2<uint16_t>& cellCoords);
+	void FlagInput(const Vec2<uint16_t>& touchCoords);
 private:
+	void RevealCell(const Vec2<uint16_t>& cellCoords);
+	void DrawBorders();
 	void RevealAllBombs();
 private:
 	GameStatus& gameStatus;
@@ -94,4 +100,5 @@ private:
 	const unsigned short int ScreenHeight;
 	const unsigned short int BorderThiccness; //Thicc border o_o
 	const unsigned short int nBombs;
+	uint16_t nHiddenCells = NUMBER_CELLS_H * NUMBER_CELLS_V;
 };
